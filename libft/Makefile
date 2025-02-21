@@ -32,6 +32,7 @@ SRC = ft_calloc.c \
 			ft_putendl_fd.c \
 			ft_split.c \
 			ft_putstr.c \
+			ft_error.c
 			ft_free_split.c \
 
 OBJS = $(SRC:.c=.o)
