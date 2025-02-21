@@ -10,19 +10,23 @@
 # include <string.h>
 # include "libft/libft.h"
 
-# define ERR_INFILE "Infile"
-# define ERR_OUTFILE "Outfile"
-# define ERR_PIPE "Pipe"
-# define ERR_CMD "Command not found\n"
-
 typedef struct s_data
 {
-	int	in;
-	int	out;
-	int	pipe[2];
-	char *paths;
+	int		in;
+	int		out;
+	int		pipe[2];
+	char	*paths;
+	char	**cmd_paths;
+	char	**cmd_args;
+	char	*cmd;
+	pid_t	pid1;
+	pid_t	pid2;
 } t_data;
 
 void	msg_error(char *msg);
+void	close_pipes(t_data *data);
+char	*find_path(char *envp);
+void	child_free(t_data *data);
+void	parent_free(t_data *data);
 
 #endif

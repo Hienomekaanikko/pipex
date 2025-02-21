@@ -6,6 +6,9 @@ CC		= cc
 CFLAGS	= -Wall -Wextra -Werror
 
 SRC = pipex.c \
+		utils.c \
+		childs.c \
+		error.c
 
 OBJS = $(SRC:.c=.o)
 

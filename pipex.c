@@ -27,5 +27,16 @@ int	main(int argc, char *argv[], char *envp)
 	if (pipe(data.pipe) < 0)
 		msg_error("Pipe");
 	data.paths = find_path(envp);
-
+	data.cmd_paths = ft_split(data.paths, ':');
+	data.pid1 = fork();
+	if (data.pid1 == 0)
+		first_child(data, argv, envp);
+	data.pid2 = fork();
+	if (data.pid2 == 0)
+		second_child(data, argv, envp);
+	close_pipes(&data);
+	waitpid(data.pid1, NULL, 0);
+	waitpid(data.pid2, NULL, 0);
+	parent_free(&data);
+	return (0);
 }
