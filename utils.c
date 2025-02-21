@@ -2,9 +2,9 @@
 
 char	*find_path(char *envp)
 {
-	while (ft_strncmp("PATH", *envp, 4))
+	while (ft_strncmp("PATH", envp, 4))
 		envp++;
-	return (*envp + 5);
+	return (envp + 5);
 }
 void	close_pipes(t_data *data)
 {

@@ -12,7 +12,7 @@
 
 #include "pipex.h"
 
-int	main(int argc, char *argv[], char *envp)
+int	main(int argc, char *argv[], char **envp)
 {
 	t_data	data;
 
@@ -26,7 +26,7 @@ int	main(int argc, char *argv[], char *envp)
 		msg_error("Outfile");
 	if (pipe(data.pipe) < 0)
 		msg_error("Pipe");
-	data.paths = find_path(envp);
+	data.paths = find_path(*envp);
 	data.cmd_paths = ft_split(data.paths, ':');
 	data.pid1 = fork();
 	if (data.pid1 == 0)

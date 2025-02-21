@@ -1,4 +1,4 @@
-NAME	= push_swap
+NAME	= pipex
 LIBFT	= ./libft
 HEADERS	= -I ./includes -I ${LIBFT}
 LIBS	= ${LIBFT}/libft.a

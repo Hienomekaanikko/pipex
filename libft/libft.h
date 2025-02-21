@@ -28,7 +28,7 @@ int			ft_isprint(int c);
 int			ft_atoi(const char *str);
 int			ft_error(char *msg);
 int			ft_memcmp(const void *s1, const void *s2, size_t n);
-int			ft_strncmp(const char *str1, const char *str2, size_t n);
+int			ft_strncmp(char *str1, char *str2, size_t n);
 void		*ft_memset(void *dest, int x, size_t n);
 void		ft_bzero(void *s, size_t n);
 void		*ft_memcpy(void *dst, const void *src, size_t n);

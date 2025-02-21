@@ -28,5 +28,7 @@ void	close_pipes(t_data *data);
 char	*find_path(char *envp);
 void	child_free(t_data *data);
 void	parent_free(t_data *data);
+void	first_child(t_data data, char *argv[], char *envp[]);
+void	second_child(t_data data, char *argv[], char *envp[]);
 
 #endif
