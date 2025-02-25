@@ -1,7 +1,11 @@
 #include "libft.h"
 
-int	ft_error(char *msg)
+void	ft_error(char *msg, char *argv)
 {
-	ft_putendl_fd(msg, 2);
-	return (1);
+	char	*error_msg;
+
+	error_msg = ft_strjoin(msg, argv);
+	ft_putendl_fd(error_msg, 2);
+	free(error_msg);
+	exit(1);
 }

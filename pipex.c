@@ -17,10 +17,7 @@ int	main(int argc, char **argv, char **envp)
 	t_data  data;
 
 	if (argc != 5)
-	{
-		fprintf(stderr, "Usage: %s infile cmd1 cmd2 outfile\n", argv[0]);
-		return (1);
-	}
+		ft_error("Usage: %s infile cmd1 cmd2 outfile\n", argv[0]);
 	prep_env(&data, argc, argv);
 	data.pid1 = fork();
 	if (data.pid1 < 0)

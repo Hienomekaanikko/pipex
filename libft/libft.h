@@ -26,7 +26,7 @@ int			ft_tolower(int c);
 int			ft_isnum(char *num);
 int			ft_isprint(int c);
 int			ft_atoi(const char *str);
-int			ft_error(char *msg);
+void		ft_error(char *msg, char *argv);
 int			ft_memcmp(const void *s1, const void *s2, size_t n);
 int			ft_strncmp(char *str1, char *str2, size_t n);
 void		*ft_memset(void *dest, int x, size_t n);

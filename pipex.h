@@ -34,8 +34,6 @@ typedef struct s_data
 
 void	prep_env(t_data *data, int argc, char **argv);
 void	get_path(t_data *data, char *cmd, char **envp);
-void	init_child_one(t_data *data, char **argv, char **envp);
-void	init_child_two(t_data *data, char **argv, char **envp);
 void	child_one(t_data *data, char **argv, char **envp);
 void	child_two(t_data *data, char **argv, char **envp);
 void	free_data(t_data *data);

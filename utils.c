@@ -36,7 +36,7 @@ void	get_path(t_data *data, char *cmd, char **envp)
 		i++;
 	if (envp[i] == NULL)
 	{
-		fprintf(stderr, "PATH variable not found\n");
+		ft_error("PATH variable not found\n", NULL);
 		return ;
 	}
 	data->paths = ft_split(envp[i] + 5, ':');
@@ -52,7 +52,7 @@ void	get_path(t_data *data, char *cmd, char **envp)
 		data->path = NULL;
 		i++;
 	}
-	fprintf(stderr, "Command not found in path: %s\n", cmd);
+	ft_error("Command not found in path: %s\n", cmd);
 }
 
 void	child_one(t_data *data, char **argv, char **envp)
@@ -69,11 +69,7 @@ void	child_one(t_data *data, char **argv, char **envp)
 	cmd_args = ft_split(argv[2], ' ');
 	get_path(data, cmd_args[0], envp);
 	if (data->path == NULL)
-	{
-		fprintf(stderr, "Command not found: %s\n", argv[2]);
-		ft_free_split(cmd_args);
-		exit(1);
-	}
+		ft_error("Command not found: %s\n", argv[2]);
 	execve(data->path, cmd_args, envp);
 	perror("Execve failed in child one");
 	ft_free_split(cmd_args);
@@ -95,11 +91,7 @@ void	child_two(t_data *data, char **argv, char **envp)
 	cmd_args = ft_split(argv[3], ' ');
 	get_path(data, cmd_args[0], envp);
 	if (data->path == NULL)
-	{
-		fprintf(stderr, "Command not found: %s\n", argv[3]);
-		ft_free_split(cmd_args);
-		exit(1);
-	}
+		ft_error("Command not found: %s\n", argv[3]);
 	execve(data->path, cmd_args, envp);
 	perror("Execve failed in child two");
 	ft_free_split(cmd_args);
