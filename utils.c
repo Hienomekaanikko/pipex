@@ -8,39 +8,22 @@ void	prep_env(t_data *data, int argc, char **argv)
 		perror("Failed to open input file");
 		exit(1);
 	}
-	data->out = open(argv[argc - 1], O_TRUNC | O_CREAT | O_RDWR, 0000644);
+	data->out = open(argv[argc - 1], O_TRUNC | O_CREAT | O_RDWR, 0644);
 	if (data->out < 0)
 	{
 		perror("Failed to open output file");
+		close(data->in);
 		exit(1);
 	}
 	if (pipe(data->pipe) < 0)
 	{
 		perror("Pipe failed");
+		close(data->in);
+		close(data->out);
 		exit(1);
 	}
-}
-
-void	init_child_one(t_data *data, char **argv, char **envp)
-{
-	if (data->pid1 == -1)
-	{
-		perror("Fork failed for pid1");
-		exit(1);
-	}
-	if (data->pid1 == 0)
-		child_one(data, argv, envp);
-}
-
-void	init_child_two(t_data *data, char **argv, char **envp)
-{
-	if (data->pid2 == -1)
-	{
-		perror("Fork failed for pid2");
-		exit(1);
-	}
-	if (data->pid2 == 0)
-		child_two(data, argv, envp);
+	data->paths = NULL;
+	data->path = NULL;
 }
 
 void	get_path(t_data *data, char *cmd, char **envp)
@@ -83,16 +66,18 @@ void	child_one(t_data *data, char **argv, char **envp)
 	close(data->in);
 	close(data->out);
 
-	get_path(data, ft_split(argv[2], ' ')[0], envp);
+	cmd_args = ft_split(argv[2], ' ');
+	get_path(data, cmd_args[0], envp);
 	if (data->path == NULL)
 	{
 		fprintf(stderr, "Command not found: %s\n", argv[2]);
+		ft_free_split(cmd_args);
 		exit(1);
 	}
-	cmd_args = ft_split(argv[2], ' ');
 	execve(data->path, cmd_args, envp);
 	perror("Execve failed in child one");
 	ft_free_split(cmd_args);
+	free_data(data);
 	exit(1);
 }
 
@@ -107,15 +92,27 @@ void	child_two(t_data *data, char **argv, char **envp)
 	close(data->in);
 	close(data->out);
 
-	get_path(data, ft_split(argv[3], ' ')[0], envp);
+	cmd_args = ft_split(argv[3], ' ');
+	get_path(data, cmd_args[0], envp);
 	if (data->path == NULL)
 	{
 		fprintf(stderr, "Command not found: %s\n", argv[3]);
+		ft_free_split(cmd_args);
 		exit(1);
 	}
-	cmd_args = ft_split(argv[3], ' ');
 	execve(data->path, cmd_args, envp);
 	perror("Execve failed in child two");
 	ft_free_split(cmd_args);
+	free_data(data);
 	exit(1);
+}
+
+void	free_data(t_data *data)
+{
+	if (data->paths)
+		ft_free_split(data->paths);
+	if (data->path)
+		free(data->path);
+	close(data->in);
+	close(data->out);
 }

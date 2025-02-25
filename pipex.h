@@ -13,12 +13,12 @@
 #ifndef PIPEX_H
 # define PIPEX_H
 
-#include "libft/libft.h"
-#include <unistd.h>
-#include <fcntl.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <stdio.h>
+# include "libft/libft.h"
+# include <unistd.h>
+# include <fcntl.h>
+# include <sys/types.h>
+# include <sys/wait.h>
+# include <stdio.h>
 
 typedef struct s_data
 {
@@ -34,11 +34,10 @@ typedef struct s_data
 
 void	prep_env(t_data *data, int argc, char **argv);
 void	get_path(t_data *data, char *cmd, char **envp);
-void	init_child_one(t_data *data, char **argv, char **evnp);
-void	init_child_two(t_data *data, char **argv, char **evnp);
-void	child_one(t_data *data, char **argv, char **evnp);
-void	child_two(t_data *data, char **argv, char **evnp);
-void	free_string_array(char **arr);
-
+void	init_child_one(t_data *data, char **argv, char **envp);
+void	init_child_two(t_data *data, char **argv, char **envp);
+void	child_one(t_data *data, char **argv, char **envp);
+void	child_two(t_data *data, char **argv, char **envp);
+void	free_data(t_data *data);
 
 #endif
