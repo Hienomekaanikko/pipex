@@ -13,23 +13,32 @@
 #ifndef PIPEX_H
 # define PIPEX_H
 
-#include "libft.h"
+#include "libft/libft.h"
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <stdio.h>
 
 typedef struct s_data
 {
-	int		in;
-	int		out;
-	int		pipe[2];
-	char	**cmds;
-	char	*cmd;
 	pid_t	pid1;
 	pid_t	pid2;
+	char	*cmd;
+	char	**paths;
+	char	*path;
+	int		pipe[2];
+	int		in;
+	int		out;
 } t_data;
 
-char	*get_command(char **paths, char *cmd);
+void	prep_env(t_data *data, int argc, char **argv);
+void	get_path(t_data *data, char *cmd, char **envp);
+void	init_child_one(t_data *data, char **argv, char **evnp);
+void	init_child_two(t_data *data, char **argv, char **evnp);
+void	child_one(t_data *data, char **argv, char **evnp);
+void	child_two(t_data *data, char **argv, char **evnp);
+void	free_string_array(char **arr);
+
 
 #endif
