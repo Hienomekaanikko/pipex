@@ -38,8 +38,13 @@ void	ft_exit(t_data *data, char *msg, int exitcode)
 void	prep_env(char **argv, t_data *data)
 {
 	data->in = open(argv[1], O_RDONLY);
+	if (data->in == -1)
+		ft_exit(data, "ERROR: Input file opening failed", 1);
 	data->out = open(argv[4], O_TRUNC | O_CREAT | O_RDWR, 0644);
-	pipe(data->pipe);
+	if (data->out == -1)
+		ft_exit(data, "ERROR: Output file opening failed", 1);
+	if (pipe(data->pipe) == -1)
+		ft_exit(data, "ERROR: Pipe creation failed", 1);
 }
 
 void	init_data(t_data *data)
@@ -91,9 +96,9 @@ void	find_path(t_data *data, char *cmd, char **envp)
 void	child_one(t_data *data, char *cmd, char **envp)
 {
 	data->cmd1 = ft_split(cmd, ' ');
-	find_path(data, data->cmd1[0], envp);
 	if (!data->cmd1)
 		ft_exit(data, "ERROR: Malloc", 1);
+	find_path(data, data->cmd1[0], envp);
 	dup2(data->in, 0);
 	close(data->in);
 	dup2(data->pipe[1], 1);
@@ -104,13 +109,13 @@ void	child_one(t_data *data, char *cmd, char **envp)
 void	child_two(t_data *data, char *cmd, char **envp)
 {
 	data->cmd2 = ft_split(cmd, ' ');
-	find_path(data, data->cmd2[0], envp);
 	if (!data->cmd2)
 		ft_exit(data, "ERROR: Malloc", 1);
-	dup2(data->out, 1);
-	close(data->out);
+	find_path(data, data->cmd2[0], envp);
 	dup2(data->pipe[0], 0);
 	close(data->pipe[0]);
+	dup2(data->out, 1);
+	close(data->out);
 	execve(data->path, data->cmd2, envp);
 }
 
@@ -133,9 +138,7 @@ int	main(int argc, char **argv, char **envp)
 		if (data.pid2 == -1)
 			ft_exit(&data, "ERROR: Fork", 1);
 		else if (data.pid2 == 0)
-			child_two(&data, argv[4], envp);
-		waitpid(data.pid1, NULL, 0);
-		waitpid(data.pid2, NULL, 0);
+			child_two(&data, argv[3], envp);
 	}
 	return (0);
 }
