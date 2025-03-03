@@ -107,7 +107,8 @@ void	child_one(t_data *data, char *cmd, char **envp)
 	dup2(data->in, 0);
 	dup2(data->pipe[1], 1);
 	close_fds(data);
-	execve(data->path, data->cmd1, envp);
+	if (execve(data->path, data->cmd1, envp) < 0)
+		ft_exit(data, "ERROR: Execve failed in child one", 1);
 }
 
 void	child_two(t_data *data, char *cmd, char **envp)
@@ -119,7 +120,8 @@ void	child_two(t_data *data, char *cmd, char **envp)
 	dup2(data->pipe[0], 0);
 	dup2(data->out, 1);
 	close_fds(data);
-	execve(data->path, data->cmd2, envp);
+	if (execve(data->path, data->cmd1, envp) < 0)
+		ft_exit(data, "ERROR: Execve failed in child two", 1);
 }
 
 int	main(int argc, char **argv, char **envp)
