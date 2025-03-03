@@ -12,7 +12,7 @@
 
 #include "pipex.h"
 
-void	ft_exit(t_data *data, char *msg, int exitcode)
+void close_fds(t_data *data)
 {
 	if (data->in != -1)
 		close(data->in);
@@ -22,6 +22,11 @@ void	ft_exit(t_data *data, char *msg, int exitcode)
 		close(data->pipe[0]);
 	if (data->pipe[1] != -1)
 		close(data->pipe[1]);
+}
+
+void	ft_exit(t_data *data, char *msg, int exitcode)
+{
+	close_fds(data);
 	if (data->path)
 		free(data->path);
 	if (data->paths)
@@ -58,15 +63,6 @@ void	init_data(t_data *data)
 	data->pipe[0] = -1;
 	data->pipe[1] = -1;
 }
-
-void close_fds(t_data *data)
-{
-	close(data->in);
-	close(data->out);
-	close(data->pipe[0]);
-	close(data->pipe[1]);
-}
-
 
 void	find_path(t_data *data, char *cmd, char **envp)
 {
@@ -110,9 +106,7 @@ void	child_one(t_data *data, char *cmd, char **envp)
 	find_path(data, data->cmd1[0], envp);
 	dup2(data->in, 0);
 	dup2(data->pipe[1], 1);
-	close(data->in);
-	close(data->pipe[0]);
-	close(data->pipe[1]);
+	close_fds(data);
 	execve(data->path, data->cmd1, envp);
 }
 
@@ -124,9 +118,7 @@ void	child_two(t_data *data, char *cmd, char **envp)
 	find_path(data, data->cmd2[0], envp);
 	dup2(data->pipe[0], 0);
 	dup2(data->out, 1);
-	close(data->out);
-	close(data->pipe[0]);
-	close(data->pipe[1]);
+	close_fds(data);
 	execve(data->path, data->cmd2, envp);
 }
 
