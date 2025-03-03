@@ -26,7 +26,6 @@ char	*ft_strjoin(char *dest, char *src)
 		free(dest);
 		return (NULL);
 	}
-	free(dest);
 	ft_memcpy(new_str, dest, dest_len);
 	ft_memcpy(new_str + dest_len, src, src_len + 1);
 	return (new_str);
