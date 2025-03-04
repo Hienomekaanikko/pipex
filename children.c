@@ -10,7 +10,7 @@ void	child_one(t_data *data, char *cmd, char **envp)
 		ft_exit(data, "dup2 input fail child_one", 1);
 	if (dup2(data->pipe[1], 1) == -1)
 		ft_exit(data, "dup2 pipe fail child_one", 1);
-	close_fds(data);
+	close(data->pipe[0]);
 	if (execve(data->path, data->cmd1, envp) < 0)
 		ft_exit(data, "execve fail child_one", 1);
 }
@@ -25,7 +25,7 @@ void	child_two(t_data *data, char *cmd, char **envp)
 		ft_exit(data, "dup2 pipe fail child_two", 1);
 	if (dup2(data->out, 1) == -1)
 		ft_exit(data, "dup2 output fail child_two", 1);
-	close_fds(data);
+	close(data->pipe[1]);
 	if (execve(data->path, data->cmd2, envp) < 0)
 		ft_exit(data, "execve fail child_two", 1);
 }
