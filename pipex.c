@@ -11,8 +11,10 @@
 /* ************************************************************************** */
 
 #include "pipex.h"
+#include <unistd.h>
+#include <fcntl.h>
 
-void close_fds(t_data *data)
+void	close_fds(t_data *data)
 {
 	if (data->in != -1)
 		close(data->in);
@@ -42,14 +44,16 @@ void	ft_exit(t_data *data, char *msg, int exitcode)
 
 void	prep_env(char **argv, t_data *data)
 {
+	if (access(argv[1], R_OK) == -1)
+		ft_exit(data, "input file not readable", 1);
 	data->in = open(argv[1], O_RDONLY);
 	if (data->in == -1)
-		ft_exit(data, "ERROR: Input file opening failed", 1);
+		ft_exit(data, "input file fail prep_env", 1);
 	data->out = open(argv[4], O_TRUNC | O_CREAT | O_RDWR, 0644);
 	if (data->out == -1)
-		ft_exit(data, "ERROR: Output file opening failed", 1);
+		ft_exit(data, "output file fail prep_env", 1);
 	if (pipe(data->pipe) == -1)
-		ft_exit(data, "ERROR: Pipe creation failed", 1);
+		ft_exit(data, "pipe fail prep_env", 1);
 }
 
 void	init_data(t_data *data)
@@ -73,19 +77,20 @@ void	find_path(t_data *data, char *cmd, char **envp)
 	while (envp[i] && ft_strncmp(envp[i], "PATH=", 5) != 0)
 		i++;
 	if (!envp[i])
-		ft_exit(data, "ERROR: Path not found", 127);
+		ft_exit(data, "path not found", 127);
 	data->paths = ft_split(envp[i] + 5, ':');
 	if (!data->paths)
-		ft_exit(data, "ERROR: Malloc", 1);
+		ft_exit(data, "malloc fail find_path", 1);
 	i = 0;
-	while (envp[i])
+	while (data->paths[i])
 	{
 		path = ft_strjoin(data->paths[i], "/");
 		if (!path)
-			ft_exit(data, "ERROR: Malloc", 1);
+			ft_exit(data, "malloc fail find_path", 1);
 		data->path = ft_strjoin(path, cmd);
+		free(path);
 		if (!data->path)
-			ft_exit(data, "ERROR: Malloc", 1);
+			ft_exit(data, "malloc fail find_path", 1);
 		if (access(data->path, F_OK | X_OK) == 0)
 		{
 			ft_free_split(data->paths);
@@ -95,58 +100,67 @@ void	find_path(t_data *data, char *cmd, char **envp)
 		data->path = NULL;
 		i++;
 	}
-	ft_exit(data, "ERROR: Path not found", 127);
+	ft_exit(data, "path not found", 127);
 }
 
 void	child_one(t_data *data, char *cmd, char **envp)
 {
 	data->cmd1 = ft_split(cmd, ' ');
 	if (!data->cmd1)
-		ft_exit(data, "ERROR: Malloc", 1);
+		ft_exit(data, "malloc fail child_one", 1);
 	find_path(data, data->cmd1[0], envp);
-	dup2(data->in, 0);
-	dup2(data->pipe[1], 1);
+	if (dup2(data->in, STDIN_FILENO) == -1)
+		ft_exit(data, "dup2 input fail child_one", 1);
+	if (dup2(data->pipe[1], STDOUT_FILENO) == -1)
+		ft_exit(data, "dup2 pipe fail child_one", 1);
 	close_fds(data);
 	if (execve(data->path, data->cmd1, envp) < 0)
-		ft_exit(data, "ERROR: Execve failed in child one", 1);
+		ft_exit(data, "execve fail child_one", 1);
 }
 
 void	child_two(t_data *data, char *cmd, char **envp)
 {
 	data->cmd2 = ft_split(cmd, ' ');
 	if (!data->cmd2)
-		ft_exit(data, "ERROR: Malloc", 1);
+		ft_exit(data, "malloc fail child_two", 1);
 	find_path(data, data->cmd2[0], envp);
-	dup2(data->pipe[0], 0);
-	dup2(data->out, 1);
+	if (dup2(data->pipe[0], STDIN_FILENO) == -1)
+		ft_exit(data, "dup2 pipe fail child_two", 1);
+	if (dup2(data->out, STDOUT_FILENO) == -1)
+		ft_exit(data, "dup2 output fail child_two", 1);
 	close_fds(data);
-	if (execve(data->path, data->cmd1, envp) < 0)
-		ft_exit(data, "ERROR: Execve failed in child two", 1);
+	if (execve(data->path, data->cmd2, envp) < 0)
+		ft_exit(data, "execve fail child_two", 1);
 }
 
 int	main(int argc, char **argv, char **envp)
 {
+	int		status;
 	t_data	data;
 
-	init_data(&data);
 	if (argc != 5)
-		ft_exit(&data, "ERROR: Invalid amount of arguments", 1);
-	else
-	{
-		prep_env(argv, &data);
-		data.pid1 = fork();
-		if (data.pid1 == -1)
-			ft_exit(&data, "ERROR: Fork", 1);
-		else if (data.pid1 == 0)
-			child_one(&data, argv[2], envp);
-		data.pid2 = fork();
-		if (data.pid2 == -1)
-			ft_exit(&data, "ERROR: Fork", 1);
-		else if (data.pid2 == 0)
-			child_two(&data, argv[3], envp);
-		close_fds(&data);
-		waitpid(data.pid1, NULL, 0);
-		waitpid(data.pid2, NULL, 0);
-	}
+		ft_exit(&data, "usage: ./pipex infile cmd1 cmd2 outfile", 1);
+	init_data(&data);
+	prep_env(argv, &data);
+	data.pid1 = fork();
+	if (data.pid1 == -1)
+		ft_exit(&data, "pid1 fork fail", 1);
+	else if (data.pid1 == 0)
+		child_one(&data, argv[2], envp);
+	data.pid2 = fork();
+	if (data.pid2 == -1)
+		ft_exit(&data, "pid2 fork fail", 1);
+	else if (data.pid2 == 0)
+		child_two(&data, argv[3], envp);
+	close_fds(&data);
+	if (waitpid(data.pid1, &status, 0) == -1)
+		ft_exit(&data, "waitpid fail child_one", 1);
+	if (WIFEXITED(status) && WEXITSTATUS(status) > 1)
+		ft_exit(&data, "child process 1 exited with error", WEXITSTATUS(status));
+	if (waitpid(data.pid2, &status, 0) == -1)
+		ft_exit(&data, "waitpid fail child_two", 1);
+	if (WIFEXITED(status) && WEXITSTATUS(status) != 0)
+		ft_exit(&data, "child process 2 exited with error", WEXITSTATUS(status));
+	ft_exit(&data, NULL, 0);
 	return (0);
 }
