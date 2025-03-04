@@ -33,4 +33,12 @@ typedef struct s_data
 	int		out;
 } t_data;
 
+void	init_data(t_data *data);
+void	prep_env(char **argv, t_data *data);
+void	close_fds(t_data *data);
+void	ft_exit(t_data *data, char *msg, int exitcode);
+void	child_one(t_data *data, char *cmd, char **envp);
+void	child_two(t_data *data, char *cmd, char **envp);
+void	find_path(t_data *data, char *cmd, char **envp);
+
 #endif
