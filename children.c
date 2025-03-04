@@ -6,9 +6,9 @@ void	child_one(t_data *data, char *cmd, char **envp)
 	if (!data->cmd1)
 		ft_exit(data, "malloc fail child_one", 1);
 	find_path(data, data->cmd1[0], envp);
-	if (dup2(data->in, 1) == -1)
+	if (dup2(data->in, 0) == -1)
 		ft_exit(data, "dup2 input fail child_one", 1);
-	if (dup2(data->pipe[1], 0) == -1)
+	if (dup2(data->pipe[1], 1) == -1)
 		ft_exit(data, "dup2 pipe fail child_one", 1);
 	close_fds(data);
 	if (execve(data->path, data->cmd1, envp) < 0)

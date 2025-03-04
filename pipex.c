@@ -86,6 +86,5 @@ int	main(int argc, char **argv, char **envp)
 	close_fds(&data);
 	wait_for_child(&data, data.pid1, "child_one exited with error");
 	wait_for_child(&data, data.pid2, "child_two exited with error");
-	ft_exit(&data, NULL, 0);
 	return (0);
 }
