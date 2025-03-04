@@ -11,8 +11,6 @@
 /* ************************************************************************** */
 
 #include "pipex.h"
-#include <unistd.h>
-#include <fcntl.h>
 
 void	close_fds(t_data *data)
 {
